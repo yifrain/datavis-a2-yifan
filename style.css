@@ -1,5 +1,69 @@
 body {
     height: 100%;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
 }
 
 /* YOUR CSS CODE GOES HERE */
+/* 布局与图例样式 */
+#page-header {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 18px 24px 14px;
+  background: linear-gradient(180deg, #f9fbfd 0%, #eef3f9 100%);
+  border-bottom: 1px solid #e6edf5;
+  box-shadow: 0 2px 6px rgba(32, 52, 89, 0.06);
+}
+.header-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.header-icon { font-size: 28px; }
+.header-title { margin: 0; font-size: 22px; color: #2b3a67; letter-spacing: 0.2px; font-weight: 700; }
+.header-subtitle { margin: 6px 0 0 40px; color: #5b6c8e; font-size: 14px; }
+
+#layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  padding: 16px 16px 24px;
+  min-height: calc(100vh - 72px); /* 视口剩余高度（约等于页眉高度） */
+}
+
+#scatterplot {
+  flex: 1 1 auto;
+  min-width: 520px;
+}
+
+#legend-container {
+  width: 240px;
+  min-width: 240px;
+}
+
+#legend-container svg {
+  display: block;
+  margin-bottom: 16px;
+}
+
+.legend-title {
+  font-weight: 700;
+  fill: #2b3a67;
+}
+
+/* 右侧详情面板位置与样式 */
+#legend-container #detail-panel {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 8px 0 0;
+  padding: 12px 14px;
+  background: #fff;
+  border: 1px solid #e5e5ef;
+  border-radius: 8px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+}
+
+/* 提示气泡更显眼 */
+.tooltip {
+  font-size: 13px;
+}

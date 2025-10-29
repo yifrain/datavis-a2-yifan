@@ -5,7 +5,7 @@ This repository contains the bare-bones files to start up and solve the second a
 It also contains the sample cars.csv dataset -- remember, it contains some errors! 
 
 ## Local development: 
-Pre-requisite: [Node.js](https://nodejs.org/en). Install `serve` using: 
+Pre-requisite: [Node.js](https://nodejs.org/en). Install `serve` using:
 > npm install serve --global 
 
 And start the application using 

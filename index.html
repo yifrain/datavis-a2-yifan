@@ -2,14 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>DataVis - Assignment 2</title>
-    
-    Instead of this blank page, your beautiful visualizations should appear here :)
+    <title>DataVis - Assignment 2 - Yifan Li</title>
     
     <!-- Loading d3js version 5-->
     <script src="d3.v5.min.js"></script>
   
-    
     <!-- Loading style.css; use if needed -->
     <link rel="stylesheet" href="style.css">
 
@@ -17,7 +14,22 @@
 
 <body>
 
+<!-- 页眉标题与图标 -->
+<header id="page-header">
+  <div class="header-inner">
+    <span class="header-icon" aria-hidden="true">🚗</span>
+    <h1 class="header-title">DataVis Assignment 2 · Car Performance Scatterplot</h1>
+  </div>
+  <p class="header-subtitle">马力 × 城市油耗（截断至60MPG） · 颜色代表车型，大小代表零售价</p>
+  </header>
+
 <!-- YOUR SOLUTION GOES HERE-->
+
+<!-- 布局容器：左图右侧图例 -->
+<div id="layout">
+  <div id="scatterplot"></div>
+  <div id="legend-container"></div>
+ </div>
 
 
 <!-- loading the main javascript file; implement logic there -->
