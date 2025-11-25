@@ -5,7 +5,6 @@ body {
 }
 
 /* YOUR CSS CODE GOES HERE */
-/* 布局与图例样式 */
 #page-header {
   width: 100%;
   box-sizing: border-box;
@@ -63,7 +62,7 @@ body {
   box-shadow: 0 1px 6px rgba(0,0,0,0.08);
 }
 
-/* 提示气泡更显眼 */
+/* 提示气泡 */
 .tooltip {
   font-size: 13px;
 }
