@@ -27,7 +27,7 @@ body {
   align-items: flex-start;
   gap: 24px;
   padding: 16px 16px 24px;
-  min-height: calc(100vh - 72px); /* 视口剩余高度（约等于页眉高度） */
+  min-height: calc(100vh - 72px); /* Viewport remaining height (≈ header height) */
 }
 
 #scatterplot {
@@ -50,7 +50,7 @@ body {
   fill: #2b3a67;
 }
 
-/* 右侧详情面板位置与样式 */
+/* Right-side detail panel position and style */
 #legend-container #detail-panel {
   box-sizing: border-box;
   width: 100%;
@@ -62,7 +62,7 @@ body {
   box-shadow: 0 1px 6px rgba(0,0,0,0.08);
 }
 
-/* 提示气泡 */
+/* Tooltip */
 .tooltip {
   font-size: 13px;
 }

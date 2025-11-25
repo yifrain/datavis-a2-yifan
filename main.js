@@ -1,6 +1,6 @@
 // Waiting until document has loaded
 window.onload = () => {
-  // 加载数据
+  // Load data
   d3.csv("cars.csv").then(data => {
     data.forEach(d => {
       d.Horsepower = +d["Horsepower(HP)"];
@@ -16,7 +16,7 @@ window.onload = () => {
 
     const mpgThreshold = 60;
     const typeDomain = Array.from(new Set(data.map(d => d.Type))).filter(Boolean);
-    // 使用更协调的 Tableau 10 调色板（更柔和、减少割裂感）
+    // Use a more balanced Tableau 10 palette (softer, less harsh)
     const palette = [
       "#4E79A7", "#F28E2B", "#E15759", "#76B7B2", "#59A14F",
       "#EDC948", "#B07AA1", "#FF9DA7", "#9C755F", "#BAB0AC"
@@ -25,21 +25,21 @@ window.onload = () => {
       .domain(typeDomain)
       .range(palette.slice(0, typeDomain.length));
 
-    // 指定高对比度覆盖色（提高可区分度）
+    // High-contrast overlay color (improves distinguishability)
     const typeColorOverrides = {};
     function typeColor(t) { return colorScale(t); }
 
-    // 筛选状态（初始为全选）
-    // 通过 Color 图例实现类型筛选（不需要独立筛选框）
+    // Filter state (initially all selected)
+    // Type filtering via the Color legend (no separate filter panel)
     let filters = { types: new Set(typeDomain) };
-    // 图例只构建一次，后续只更新状态，避免布局上/下移
+    // Build legends once; only update state later to avoid layout shifts
     let legendBuilt = false;
     let colorLegendSvg = null;
     let sizeLegendSvg = null;
-    // 密度模式开关（保留到全局以便刷新后保留）
+    // Density mode toggle (persisted globally to retain after refresh)
     let densityMode = window.__DENSITY_MODE__ || false;
-    // 尺寸缩放控制
-    let sizeFactor = window.__SIZE_FACTOR__ || 1.0; // 持久在全局以便刷新后保留
+    // Size scaling control
+    let sizeFactor = window.__SIZE_FACTOR__ || 1.0; // Persist globally to retain after refresh
     const baseSizeRange = [4, 12];
     let sizeLegendValuesGlobal = null;
     let capPriceGlobal = null;
@@ -56,7 +56,7 @@ window.onload = () => {
     }
     function updateSizeLegend(sizeScale) {
       if (!legendBuilt || !sizeLegendSvg || !sizeLegendValuesGlobal) return;
-      // 重新计算每一行的位置与圆半径，保持内部布局但不改变整体高度
+      // Recompute each row position and circle radius; keep internal layout without changing total height
       let yOffset = 24;
       sizeLegendSvg.selectAll('g.size-row').each(function(v){
         const r = sizeScale(v);
@@ -87,29 +87,29 @@ window.onload = () => {
       const innerWidth = width - margin.left - margin.right;
       const innerHeight = height - margin.top - margin.bottom;
 
-      // 清空旧的图（保留图例，避免布局跳动）
+      // Clear old chart (keep legends to avoid layout jump)
       container.selectAll("svg").remove();
 
-      // 创建 SVG 容器
+      // Create SVG container
       const svg = container.append("svg")
         .attr("width", width)
         .attr("height", height);
 
       const chart = svg.append("g")
         .attr("transform", `translate(${margin.left}, ${margin.top})`);
-      // 高亮层：用于绘制悬浮/选中外圈（不影响原点）
+      // Highlight layer: draws hover/selection halo without affecting original points
       const haloLayer = chart.append("g").attr("class", "halo-layer").style("pointer-events", "none");
-      // 计算与点颜色同色系的荧光色（提高饱和度与亮度）
+      // Compute a neon color in the same hue family (increase saturation and lightness)
       function computeNeon(hex) {
         const base = d3.color(hex);
-        if (!base) return "#39ff14"; // 回退为绿色荧光
+        if (!base) return "#39ff14"; // Fallback neon green
         const hsl = d3.hsl(base);
-        hsl.s = 1; // 饱和度拉满
-        hsl.l = Math.min(0.72, hsl.l + 0.22); // 提升亮度到更接近荧光
+        hsl.s = 1; // Max out saturation
+        hsl.l = Math.min(0.72, hsl.l + 0.22); // Raise lightness closer to neon
         return hsl.toString();
       }
 
-      // 高亮滤镜（悬浮/选中发光效果）
+      // Glow filter (hover/selection bloom effect)
       const defs = svg.append("defs");
       const glow = defs.append("filter")
         .attr("id", "point-glow")
@@ -124,7 +124,7 @@ window.onload = () => {
         .attr("flood-color", "#000")
         .attr("flood-opacity", 0.35);
 
-      // x/y 尺度（加域外边距，避免点贴边）
+      // x/y scales (pad domain to avoid points touching edges)
       const hpExtent = d3.extent(data, d => d.Horsepower);
       const hpPad = (hpExtent[1] - hpExtent[0]) * 0.07;
       const xScale = d3.scaleLinear()
@@ -139,7 +139,7 @@ window.onload = () => {
         .range([8, innerHeight - 12])
         .clamp(true);
 
-      // 使用对数尺（不封顶），以完整价格范围保留真实信息，同时增强低价段对比
+      // Log scale (no cap): keeps full price range and enhances contrast for lower prices
       const prices = data.map(d => d.RetailPrice).filter(Number.isFinite).sort(d3.ascending);
       const minPrice = prices[0] || 1;
       const maxPrice = prices[prices.length - 1] || minPrice;
@@ -147,7 +147,7 @@ window.onload = () => {
         .domain([Math.max(1, minPrice), Math.max(2, maxPrice)])
         .range(baseSizeRange.map(v => v * sizeFactor));
 
-      // 网格线与自适应刻度密度
+      // Grid lines and adaptive tick density
       const xTickCount = Math.max(4, Math.floor(innerWidth / 90));
       chart.append("g")
         .attr("class", "grid grid-y")
@@ -160,7 +160,7 @@ window.onload = () => {
         .call(d3.axisBottom(xScale).ticks(xTickCount).tickSize(-innerHeight).tickFormat(""))
         .attr("opacity", 0.04);
 
-      // 坐标轴
+      // Axes
       const xAxis = d3.axisBottom(xScale)
         .ticks(xTickCount)
         .tickFormat(d3.format("~s"))
@@ -177,15 +177,15 @@ window.onload = () => {
         .attr("class", "y-axis")
         .call(yAxis);
 
-      // 加粗坐标轴与刻度文本
+      // Emphasize axis lines and tick texts
       xAxisG.selectAll(".tick text").attr("font-size", 14).attr("fill", "#222").attr("font-weight", "700");
       yAxisG.selectAll(".tick text").attr("font-size", 14).attr("fill", "#222").attr("font-weight", "700");
       xAxisG.select(".domain").attr("stroke-width", 2.5).attr("stroke", "#333");
       yAxisG.select(".domain").attr("stroke-width", 2.5).attr("stroke", "#333");
 
-      // 已移除箭头标记以避免斜偏，仅保留加粗坐标轴
+      // Arrow markers removed to avoid slant; keep bold axes only
 
-      // 密度层（可选）：在点之下渲染柔和的 2D 密度带/轮廓
+      // Density layer (optional): soft 2D density bands/contours under points
       chart.selectAll(".density-layer").remove();
       if (densityMode) {
         const density = d3.contourDensity()
@@ -209,7 +209,7 @@ window.onload = () => {
           .attr("opacity", d => 0.045 + 0.18 * (d.value / maxDen));
       }
 
-      // 轴标题
+      // Axis titles
       svg.append("text")
         .attr("class", "x-label")
         .attr("x", margin.left + innerWidth / 2)
@@ -225,10 +225,10 @@ window.onload = () => {
         .attr("fill", "#333")
         .text("City MPG (truncated at 60)");
 
-      // 按 Color 图例的类型选择进行过滤（轴范围仍基于全数据，避免跳动）
+      // Filter by type via Color legend (axes based on full data to prevent jumping)
       const filtered = data.filter(d => filters.types.has(d.Type));
 
-      // 优雅疏散纵向重叠：对同一像素行的点进行“垂直错位(dodge)”
+      // Gracefully disperse vertical overlap: vertical dodge for points on same pixel rows
       function symmetricOffsets(n, step) {
         const arr = [];
         if (n <= 0) return arr;
@@ -247,7 +247,7 @@ window.onload = () => {
         items.forEach(d => {
           const yVal = (Number.isFinite(d.CityMPG) && d.CityMPG > mpgThreshold) ? (mpgThreshold + 3) : d.CityMPG;
           const yPx = yScale(yVal);
-          const key = Math.round(yPx / 2); // 2px 分箱，聚合同一像素行附近
+          const key = Math.round(yPx / 2); // 2px binning; group near same pixel row
           if (!bins.has(key)) bins.set(key, []);
           bins.get(key).push(d);
         });
@@ -263,7 +263,7 @@ window.onload = () => {
       }
       const yDodgeMap = computeVerticalDodge(filtered, yScale);
 
-      // 散点（增加轻微抖动与白描边，提高区分度）
+      // Scatter points (light jitter and white stroke to improve separation)
       const points = chart.selectAll("circle.data-point")
         .data(filtered)
         .enter()
@@ -283,7 +283,7 @@ window.onload = () => {
         .attr("stroke-width", 1)
         .attr("cursor", "pointer");
 
-      // 悬停与点击交互
+      // Hover and click interactions
       points.on("mouseover", function(d) {
           const sel = d3.select(this);
           const isOutlier = Number.isFinite(d.CityMPG) && d.CityMPG > mpgThreshold;
@@ -294,7 +294,7 @@ window.onload = () => {
             .raise()
             .transition().duration(200)
             .attr("r", rTarget);
-          // 悬浮外圈高亮
+          // Hover halo highlight
           const cx = parseFloat(sel.attr("cx"));
           const cy = parseFloat(sel.attr("cy"));
           const neon = computeNeon(sel.attr("fill"));
@@ -303,7 +303,7 @@ window.onload = () => {
             .attr("class", "halo-hover")
             .attr("cx", cx)
             .attr("cy", cy)
-            // 与球体接壤：半径 = rTarget + (描边宽/2)
+            // Halo touches circle surface: radius = rTarget + (strokeWidth/2)
             .attr("r", rTarget + 3)
             .attr("fill", "none")
             .attr("stroke", neon)
@@ -335,7 +335,7 @@ window.onload = () => {
             .attr("stroke", isOutlier ? "#e74c3c" : "#000")
             .attr("stroke-width", 3)
             .raise();
-          // 选中外圈高亮（持久，荧光色，与球接壤直到下一次选中）
+          // Selection halo (persistent neon; touches circle until next selection)
           haloLayer.selectAll("circle.halo-selected").remove();
           const cx2 = parseFloat(sel.attr("cx"));
           const cy2 = parseFloat(sel.attr("cy"));
@@ -345,7 +345,7 @@ window.onload = () => {
             .attr("class", "halo-selected")
             .attr("cx", cx2)
             .attr("cy", cy2)
-            // 与球体接壤：半径 = r2 + (描边宽/2)
+            // Halo touches circle surface: radius = r2 + (strokeWidth/2)
             .attr("r", r2 + 5)
             .attr("fill", "none")
             .attr("stroke", neon)
@@ -356,26 +356,26 @@ window.onload = () => {
           const mpgText = Number.isFinite(d.CityMPG) ? d.CityMPG : "N/A";
           const hpText = Number.isFinite(d.Horsepower) ? d.Horsepower : "N/A";
           const engText = Number.isFinite(d["Engine Size (l)"]) ? d["Engine Size (l)"] : "N/A";
-          const driveText = d.AWD === 1 ? "全时四驱(AWD)" : (d.RWD === 1 ? "后轮驱动(RWD)" : "前轮驱动(FWD)");
+          const driveText = d.AWD === 1 ? "All-wheel drive (AWD)" : (d.RWD === 1 ? "Rear-wheel drive (RWD)" : "Front-wheel drive (FWD)");
           detailPanel.html(`
-            <h3 style="margin: 0; color: #333;">${d.Name || "未知车型"}</h3>
+            <h3 style="margin: 0; color: #333;">${d.Name || "Unknown model"}</h3>
             <div style="margin-top: 10px; line-height: 1.6;">
-              <p><strong>车型：</strong>${d.Type || "N/A"}</p>
-              <p><strong>马力：</strong>${hpText} HP</p>
-              <p><strong>城市油耗：</strong>${mpgText} MPG</p>
-              <p><strong>零售价：</strong>$${priceText}</p>
-              <p><strong>驱动类型：</strong>${driveText}</p>
-              <p><strong>发动机排量：</strong>${engText} L</p>
+              <p><strong>Type: </strong>${d.Type || "N/A"}</p>
+              <p><strong>Horsepower: </strong>${hpText} HP</p>
+              <p><strong>City MPG: </strong>${mpgText} MPG</p>
+              <p><strong>Retail Price: </strong>$${priceText}</p>
+              <p><strong>Drivetrain: </strong>${driveText}</p>
+              <p><strong>Engine Displacement: </strong>${engText} L</p>
             </div>
           `);
         });
 
-      // 添加刷选交互（矩形）
+      // Brush selection interaction (rectangular)
       const brush = d3.brush()
         .extent([[0, 0], [innerWidth, innerHeight]])
         .on("start brush end", function() {
           const selection = d3.event.selection;
-          // 清除之前的选中样式与外圈
+          // Clear previous selection styles and halos
           chart.selectAll("circle.data-point").classed("selected", false)
             .attr("opacity", function(p){ return (Number.isFinite(p.CityMPG) && p.CityMPG > mpgThreshold) ? 1 : 0.85; })
             .attr("stroke-width", function(p){ return (Number.isFinite(p.CityMPG) && p.CityMPG > mpgThreshold) ? 2.5 : 1; })
@@ -399,24 +399,24 @@ window.onload = () => {
               selected.push(d);
             }
           });
-          // 在详情面板顶部显示选中数量
+          // Show selected count at top of the detail panel
           detailPanel.selectAll(".selection-summary").remove();
           if (selected.length > 0) {
             detailPanel.insert("div", ":first-child")
               .attr("class", "selection-summary")
               .style("margin-bottom", "8px")
               .style("color", "#333")
-              .html(`已刷选 ${selected.length} 个点`);
+              .html(`Selected ${selected.length} points`);
           }
         });
-      // 将刷选层置于所有元素之下，避免遮挡点的点击与悬停
+      // Place brush layer beneath elements to avoid blocking point interactions
       chart.insert("g", ":first-child")
         .attr("class", "brush")
         .call(brush)
         .select(".overlay")
         .style("cursor", "default");
 
-      // 异常值集合与标注
+      // Outlier set and annotation
       const mpgOutliers = filtered.filter(d => Number.isFinite(d.CityMPG) && d.CityMPG > mpgThreshold);
       chart.selectAll("circle.data-point")
         .filter(d => mpgOutliers.indexOf(d) !== -1)
@@ -426,7 +426,7 @@ window.onload = () => {
         .attr("opacity", 1);
 
 
-      // 异常油耗示意线（位于阈值位置，不与顶部重合）
+      // Outlier MPG guide line (at threshold position; not overlapping top)
       chart.append("line")
         .attr("x1", 0)
         .attr("x2", innerWidth)
@@ -445,9 +445,9 @@ window.onload = () => {
         .attr("fill", "#e74c3c")
         .attr("font-size", "12px")
         .attr("font-weight", "600")
-        .text("⚠ 异常油耗: 1000 MPG");
+        .text("⚠ Outlier MPG: 1000 MPG");
 
-      // 右侧外置图例：颜色（点击类型行进行筛选，多选；高度固定避免下移）
+      // External legend: Color (click rows to filter; multi-select; fixed height)
       if (!legendBuilt) {
         colorLegendSvg = legendContainer.append("svg")
           .attr("width", 220)
@@ -489,7 +489,7 @@ window.onload = () => {
             render();
           });
         });
-        // 密度模式开关（插入在颜色图例下方）
+        // Density mode toggle (inserted below the Color legend)
         const densityCtrl = d3.select('#legend-container').append('div')
           .attr('id', 'density-toggle')
           .style('margin', '6px 0 8px');
@@ -510,14 +510,14 @@ window.onload = () => {
         densityLabel.append('span').text('Density mode');
       }
 
-      // 右侧外置图例：大小
+      // External legend: Size
       const priceExtent = d3.extent(data, d => d.RetailPrice);
       const priceMedian = d3.median(data, d => d.RetailPrice);
       const sizeLegendValues = [priceExtent[0], priceMedian, priceExtent[1]].filter(Number.isFinite);
       let sizeLegendHeight = 24;
       sizeLegendValues.forEach(v => { sizeLegendHeight += sizeScale(v) * 2 + 12; });
       if (!legendBuilt) {
-        // 尺寸控制滑杆（先插入，使其显示在 Size 图例上方）
+        // Size control slider (insert first so it appears above Size legend)
         const sizeCtrl = d3.select('#legend-container').append('div')
           .attr('id', 'size-control')
           .style('margin', '0 0 6px');
@@ -538,7 +538,7 @@ window.onload = () => {
             render();
           });
 
-        // 再插入 Size 图例，使其位于滑杆下方
+        // Insert Size legend below the slider
         sizeLegendSvg = legendContainer.append("svg")
           .attr("width", 220)
           .attr("height", Math.max(140, 160))
@@ -548,7 +548,7 @@ window.onload = () => {
           .attr("x", 0)
           .attr("y", 16)
           .text("Size: Retail Price");
-        // 直观示例：固定展示 10,000 与 30,000，并以最大真实价格为上限示例
+        // Examples: fixed 10,000 and 30,000, plus max price as upper example
         const priceMedian = d3.median(prices);
         const maxPriceLegend = d3.max(prices);
         sizeLegendValuesGlobal = [10000, 30000, maxPriceLegend].filter(Number.isFinite);
@@ -566,26 +566,26 @@ window.onload = () => {
         legendBuilt = true;
       }
 
-      // 更新图例的选中视觉状态（不改变布局）
+      // Update legend visual selection state (no layout changes)
       updateLegendState();
       updateSizeLegend(sizeScale);
 
-      // 详情面板（侧栏中部）与浮动提示（只创建一次）
+      // Detail panel (middle of sidebar) and tooltip (create once)
       let detailPanel = d3.select("#legend-container #detail-panel");
       if (detailPanel.empty()) {
         detailPanel = d3.select("#legend-container").append("div")
           .attr("id", "detail-panel");
         detailPanel.html(`
-          <h3 style="margin:0;color:#333;">使用说明</h3>
+          <h3 style="margin:0;color:#333;">Instructions</h3>
           <div style="margin-top:8px;line-height:1.6;color:#555;">
-            <p>散点图展示 <strong>马力</strong>(X) 与 <strong>城市油耗</strong>(Y，截断至60MPG) 的关系。</p>
-            <p><strong>颜色</strong>代表车型类型，<strong>点大小</strong>代表零售价。</p>
-            <p>将鼠标悬停查看提示，点击点在此面板显示详细信息。</p>
+            <p>The scatterplot shows the relationship between <strong>Horsepower</strong> (X) and <strong>City MPG</strong> (Y, truncated at 60).</p>
+            <p><strong>Color</strong> encodes car type; <strong>point size</strong> encodes retail price.</p>
+            <p>Hover to see tooltips; click a point to show details in this panel.</p>
           </div>
         `);
       }
 
-      // 已移除旧的复选筛选面板（类型/驱动）；筛选改由右侧 Color 图例承担
+      // Removed the old checkbox filter panel (type/drivetrain); filtering handled by right-side Color legend
 
       let tooltip = d3.select(".tooltip");
       if (tooltip.empty()) {
@@ -604,7 +604,7 @@ window.onload = () => {
       points.on("mouseover.tooltip", function(d) {
           tooltip.style("opacity", 1)
             .html(`
-              <div><strong>${d.Name || "未知车型"}</strong></div>
+              <div><strong>${d.Name || "Unknown model"}</strong></div>
               <div>Type: ${d.Type || "N/A"}</div>
               <div>HP: ${Number.isFinite(d.Horsepower) ? d.Horsepower : "N/A"}</div>
               <div>City MPG: ${Number.isFinite(d.CityMPG) ? d.CityMPG : "N/A"}</div>
@@ -620,7 +620,7 @@ window.onload = () => {
         });
     }
 
-    // 初次渲染与窗口自适应
+    // Initial render and window responsiveness
     render();
     window.addEventListener('resize', render);
   }).catch(err => {
