@@ -1,0 +1,50 @@
+# Scatterplot Matrix (SPLOM) — Answers & Project Links
+
+1) What’s a Scatterplot Matrix?
+Take n numeric attributes, then lay out all pairwise scatterplots in an n×n grid. 
+The diagonal usually shows a single attribute’s distribution (like a histogram) or just its label. 
+The top and bottom triangles are mirrors of each other, so you only need to look at one side. 
+Using the same scales and consistent colors/sizes across all plots makes it easier to compare patterns, and adding hover/brush interactions helps when things get busy.
+
+
+2) How Many Plots for n Attributes?
+- Full grid (including the diagonal): n² panels.
+- Unique pairs (no repeats, no diagonal): n(n−1)/2.
+- If both triangles have scatterplots (plus diagonal): still n² total panels.
+
+
+3) Example: 3 Cars in the Dataset
+Pick 3 key attributes: Horsepower, City MPG (capped at 60), Retail Price → a 3×3 matrix.
+Choose 3 distinct cars:
+- Car A: High horsepower, pricey, low MPG (sports car vibe)
+- Car B: Mid horsepower, mid price, decent MPG (family car)
+- Car C: Low horsepower, cheap, great MPG (economy car)
+
+Look at the off-diagonal plots:
+- Horsepower vs. City MPG: They mostly trend opposite—A’s high HP/low MPG, B’s in the middle, C’s low HP/high MPG.
+- Horsepower vs. Price: Generally goes up together—A’s expensive and powerful, C’s cheap and low-powered.
+- City MPG vs. Price: Usually opposite—cheaper cars (like C) get better MPG.
+
+To make it clearer:
+- Use different shapes/thicker borders for these 3 cars (keep color for car type).
+- Mark their values on the diagonal plots.
+- Add a small legend for the shapes, plus hover tooltips to check details.
+
+
+4) Pros & Cons
+- **Good stuff**:
+  - Sees all attribute relationships at once—catches trends, clusters, or odd points fast.
+  - Hover/brush tools make it easier to dig into specific data.
+  - Same axes/scales across plots mean you don’t misread comparisons.
+- **Not so good**:
+  - Gets crowded fast (n² panels)—too many attributes = too many tiny plots.
+  - Lots of data = overlapping points; you might need to fade points or spread them out a bit.
+  - Too many car types = colors get messy, and the legend gets long.
+  - Only shows 2-attribute relationships—can’t spot 3+ attribute patterns directly.
+  - Inconsistent axis scales across plots can trick you into wrong conclusions.
+
+
+5) Project Links
+- Code repo: https://github.com/yifrain/datavis-a2-yifan
+- Try it online (GitHub Pages): https://yifrain.github.io/datavis-a2-yifan/
+Note: It’s a static site—just open it in a modern browser, and the CSV loads automatically so you can interact with the plot.
