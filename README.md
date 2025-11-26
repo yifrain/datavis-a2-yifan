@@ -64,6 +64,7 @@ Use the repository root as the Pages source:
 - Source: Deploy from a branch
 - Branch: `main`, folder: `/(root)`
 - Wait for publishing, then open `https://<username>.github.io/<repo>/`
+- Mine: [https://yifrain.github.io/datavis-a2-yifan/](https://yifrain.github.io/datavis-a2-yifan/)
 
 ## AI Tool Usage & Experience
 - Tool: IDE-integrated AI assistant (Trae AI)
